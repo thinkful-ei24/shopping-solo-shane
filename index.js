@@ -11,7 +11,9 @@ const STORE = [
 function generateItemElement(item, itemIndex, template) {
   return `
     <li class="js-item-index-element" data-item-index="${itemIndex}">
+    <input type="checkbox" id="checkbox">
       <span class="shopping-item js-shopping-item ${item.checked ? "shopping-item__checked" : ''}">${item.name}</span>
+
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -87,10 +89,23 @@ function handleDeleteItemClicked() {
   $('.js-shopping-list').on('click', `.js-item-delete`, event => {
     const itemIndex = getItemIndexFromElement(event.currentTarget);
     //delete STORE[itemIndex];
-    STORE.splice(itemIndex, 1);
-    console.log(STORE);
+    //STORE.splice(itemIndex, 1);
+
+    console.log(newArr);
 
     renderShoppingList();
+  });
+}
+
+//func checkbox
+  //toggle attr:__checked
+
+
+function handleSearch() {
+  $('#js-shopping-list-form').submit(function(event) {
+    event.preventDefault();
+    const searchVal = $('.js-search-input').val();
+    let newArr = STORE.filter(item => item.name === 'bread');
   });
 }
 
