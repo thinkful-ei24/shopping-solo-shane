@@ -4,20 +4,17 @@
 const STORE = [
   {name: 'apples', checked: false, checkBox: false},
   {name: 'oranges', checked: false, checkBox: false},
-  {name: 'milk', checked: true, checkBox: true},
+  {name: 'milk', checked: true, checkBox: false},
   {name: 'bread', checked: false, checkBox: false}
 ];
 
 
 function generateItemElement(item, itemIndex, template) {
   return `
-    <li class="js-item-index-element" data-item-index="${itemIndex}">
+    <li class="js-item-index-element ${item.checkBox ? 'hidden' : ''}" data-item-index="${itemIndex}">
     <input type="checkbox" id="checkbox">
-
       <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}" style="display: inline-block;">${item.name}</span>
-
       <img class="js-title-edit" src="https://png.icons8.com/ios/50/000000/pencil.png" style="display: inline; width: 18px;">
-
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
@@ -100,8 +97,8 @@ function handleItemCheckClicked() {
 
 
 function handleDeleteItemClicked() {
-  console.log('`handleDeleteItemClicked` ran');
   $('.js-shopping-list').on('click', '.js-item-delete', event => {
+    console.log('`handleDeleteItemClicked` ran');
     const itemIndex = getItemIndexFromElement(event.currentTarget);
     //delete STORE[itemIndex];
     //use splice to shift remaining to remove empty spots in array
@@ -112,12 +109,28 @@ function handleDeleteItemClicked() {
 }
 
 
-function hideChecked() {
-  console.log('`hideChecked` ran');
-  $('.js-shopping-list').on('click', '.js-item-delete', event => {
+function toggleCheckboxClicked() {
+  $('.js-shopping-list').on('click', '#checkbox', event => {
+    console.log('`toggleCheckboxClicked` ran');
     const itemIndex = getItemIndexFromElement(event.currentTarget);
-    //delete STORE[itemIndex];
-    STORE.splice(itemIndex, 1);
+    STORE[itemIndex].checkBox = !STORE[itemIndex].checkBox;
+    console.log(STORE[itemIndex]);
+
+  });
+}
+
+function hideBtnClicked() {
+  $('.container').on('click', '.hideBtn', event => {
+    console.log('`hideBtnClicked` ran');
+    renderShoppingList();
+  });
+}
+
+// add show all button function
+function showAllBtn() {
+  $('.container').on('click', '.showAllBtn', event => {
+    console.log('`showAllBtn` ran');
+    STORE.forEach(item => item.checkBox = false);
 
     renderShoppingList();
   });
@@ -125,11 +138,13 @@ function hideChecked() {
 
 
 function handleSearch() {
-  console.log('`handleSearch` ran');
   $('js-search-form').submit(function(event) {
+    console.log('`handleSearch` ran');
     event.preventDefault();
     const searchVal = $('.js-search-input').val();
     let newArr = STORE.filter(item => item.name === searchVal);
+
+    renderShoppingList();
   });
 }
 
@@ -138,7 +153,11 @@ function editItemTitle() {
   console.log('`editItemTitle` ran');
   $('.js-shopping-list').on('click', '.js-title-edit', event => {
     const itemIndex = getItemIndexFromElement(event.currentTarget);
+    const itemName = STORE[itemIndex].name;
     STORE[itemIndex].name = prompt('Enter a new item name', STORE[itemIndex].name);
+    if (STORE[itemIndex].name === null || STORE[itemIndex].name === '') {
+      STORE[itemIndex].name = itemName;
+    }
 
     renderShoppingList();
   });
@@ -154,7 +173,9 @@ function handleShoppingList() {
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
-  hideChecked();
+  toggleCheckboxClicked();
+  hideBtnClicked();
+  showAllBtn();
   handleSearch();
   editItemTitle();
 }
