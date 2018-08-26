@@ -2,25 +2,25 @@
 
 
 const STORE = [
-  {name: 'apples', checked: false, checkBox: false},
-  {name: 'oranges', checked: false, checkBox: false},
-  {name: 'milk', checked: true, checkBox: false},
-  {name: 'bread', checked: false, checkBox: false}
+  {name: 'apples', checked: false, checkBox: false, hidden: false},
+  {name: 'oranges', checked: false, checkBox: false, hidden: false },
+  {name: 'milk', checked: true, checkBox: false, hidden: false},
+  {name: 'bread', checked: false, checkBox: false, hidden: false}
 ];
 
 
 function generateItemElement(item, itemIndex, template) {
   return `
-    <li class="js-item-index-element ${item.checkBox ? 'hidden' : ''}" data-item-index="${itemIndex}">
+    <li class="js-item-index-element ${item.hidden ? 'hidden' : ''}" data-item-index="${itemIndex}">
     <input type="checkbox" id="checkbox">
-      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}" style="display: inline-block;">${item.name}</span>
+      <span class="shopping-item js-shopping-item ${item.crossed ? 'shopping-item__checked' : ''}" style="display: inline-block;">${item.name}</span>
       <img class="js-title-edit" src="https://png.icons8.com/ios/50/000000/pencil.png" style="display: inline; width: 18px;">
       <div class="shopping-item-controls">
         <button class="shopping-item-toggle js-item-toggle">
-            <span class="button-label">check</span>
+            <span class="button-label">Cross</span>
         </button>
         <button class="shopping-item-delete js-item-delete">
-            <span class="button-label">delete</span>
+            <span class="button-label">Delete</span>
         </button>
       </div>
     </li>`;
@@ -38,24 +38,17 @@ function generateShoppingItemsString(shoppingList) {
 
 function renderShoppingList() {
   // render the shopping list in the DOM
-  //let viewItems = [...STORE.items];
-
   console.log('`renderShoppingList` ran');
   const shoppingListItemsString = generateShoppingItemsString(STORE);
 
   // insert that HTML into the DOM
   $('.js-shopping-list').html(shoppingListItemsString);
-
-
-
-
-  //need to rewrite to include filtering for new arrays
-  //from searching, changing title, and hiding
 }
 
 
 function addItemToShoppingList(itemName) {
   console.log(`Adding "${itemName}" to shopping list`);
+  //create item object
   STORE.push({name: itemName, checked: false, checkBox: false});
 }
 
@@ -64,6 +57,7 @@ function handleNewItemSubmit() {
   $('#js-shopping-list-form').submit(function(event) {
     event.preventDefault();
     console.log('`handleNewItemSubmit` ran');
+    //get item name and call additem func
     const newItemName = $('.js-shopping-list-entry').val();
     $('.js-shopping-list-entry').val('');
     addItemToShoppingList(newItemName);
@@ -72,9 +66,10 @@ function handleNewItemSubmit() {
 }
 
 
-function toggleCheckedForListItem(itemIndex) {
+function toggleCrossedForListItem(itemIndex) {
   console.log('Toggling checked property for item at index ' + itemIndex);
-  STORE[itemIndex].checked = !STORE[itemIndex].checked;
+  //toggle crossed item bool value
+  STORE[itemIndex].crossed = !STORE[itemIndex].crossed;
 }
 
 
@@ -90,7 +85,7 @@ function handleItemCheckClicked() {
   $('.js-shopping-list').on('click', '.js-item-toggle', event => {
     console.log('`handleItemCheckClicked` ran');
     const itemIndex = getItemIndexFromElement(event.currentTarget);
-    toggleCheckedForListItem(itemIndex);
+    toggleCrossedForListItem(itemIndex);
     renderShoppingList();
   });
 }
@@ -108,10 +103,10 @@ function handleDeleteItemClicked() {
   });
 }
 
-
 function toggleCheckboxClicked() {
   $('.js-shopping-list').on('click', '#checkbox', event => {
     console.log('`toggleCheckboxClicked` ran');
+    //get current itemindex and set opposite bool val
     const itemIndex = getItemIndexFromElement(event.currentTarget);
     STORE[itemIndex].checkBox = !STORE[itemIndex].checkBox;
     console.log(STORE[itemIndex]);
@@ -122,38 +117,52 @@ function toggleCheckboxClicked() {
 function hideBtnClicked() {
   $('.container').on('click', '.hideBtn', event => {
     console.log('`hideBtnClicked` ran');
+    //loop through marked items and set hidden bool val
+    for (const item of STORE) {
+      if(item.checkBox) {
+        item.hidden = !item.hidden;
+      }
+    }
     renderShoppingList();
   });
 }
 
-// add show all button function
+
 function showAllBtn() {
   $('.container').on('click', '.showAllBtn', event => {
     console.log('`showAllBtn` ran');
-    STORE.forEach(item => item.checkBox = false);
-
+    //set all items to unhidden bool val
+    STORE.forEach(item => item.hidden = false);
     renderShoppingList();
   });
 }
 
 
 function handleSearch() {
-  $('js-search-form').submit(function(event) {
-    console.log('`handleSearch` ran');
+  $('#js-search-form').submit(function(event) {
     event.preventDefault();
+    console.log('`handleSearch` ran');
+    //store input string and filter results
     const searchVal = $('.js-search-input').val();
-    let newArr = STORE.filter(item => item.name === searchVal);
-
+    let filtered = STORE.filter(item => item.name === searchVal);
+    //loop through list items and hide items that don't match
+    for (const foundItem of filtered) {
+      for (const item of STORE) {
+        if(item !== foundItem) { item.hidden = true; }
+      }
+    }
     renderShoppingList();
   });
 }
 
 
 function editItemTitle() {
-  console.log('`editItemTitle` ran');
   $('.js-shopping-list').on('click', '.js-title-edit', event => {
+    console.log('`editItemTitle` ran');
     const itemIndex = getItemIndexFromElement(event.currentTarget);
+    //set default name to current name
     const itemName = STORE[itemIndex].name;
+    //create prompt box and run validity checks
     STORE[itemIndex].name = prompt('Enter a new item name', STORE[itemIndex].name);
     if (STORE[itemIndex].name === null || STORE[itemIndex].name === '') {
       STORE[itemIndex].name = itemName;
