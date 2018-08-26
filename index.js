@@ -1,11 +1,30 @@
 'use strict';
 
 
-const STORE = [
-  {name: 'apples', checked: false, checkBox: false, hidden: false},
-  {name: 'oranges', checked: false, checkBox: false, hidden: false },
-  {name: 'milk', checked: true, checkBox: false, hidden: false},
-  {name: 'bread', checked: false, checkBox: false, hidden: false}
+const STORE = [{
+    name: 'apples',
+    checked: false,
+    checkBox: false,
+    hidden: false
+  },
+  {
+    name: 'oranges',
+    checked: false,
+    checkBox: false,
+    hidden: false
+  },
+  {
+    name: 'milk',
+    checked: true,
+    checkBox: false,
+    hidden: false
+  },
+  {
+    name: 'bread',
+    checked: false,
+    checkBox: false,
+    hidden: false
+  }
 ];
 
 
@@ -49,12 +68,16 @@ function renderShoppingList() {
 function addItemToShoppingList(itemName) {
   console.log(`Adding "${itemName}" to shopping list`);
   //create item object
-  STORE.push({name: itemName, checked: false, checkBox: false});
+  STORE.push({
+    name: itemName,
+    checked: false,
+    checkBox: false
+  });
 }
 
 
 function handleNewItemSubmit() {
-  $('#js-shopping-list-form').submit(function(event) {
+  $('#js-shopping-list-form').submit(function (event) {
     event.preventDefault();
     console.log('`handleNewItemSubmit` ran');
     //get item name and call additem func
@@ -119,7 +142,7 @@ function hideBtnClicked() {
     console.log('`hideBtnClicked` ran');
     //loop through marked items and set hidden bool val
     for (const item of STORE) {
-      if(item.checkBox) {
+      if (item.checkBox) {
         item.hidden = !item.hidden;
       }
     }
@@ -139,7 +162,7 @@ function showAllBtn() {
 
 
 function handleSearch() {
-  $('#js-search-form').submit(function(event) {
+  $('#js-search-form').submit(function (event) {
     event.preventDefault();
     console.log('`handleSearch` ran');
     //store input string and filter results
@@ -148,7 +171,9 @@ function handleSearch() {
     //loop through list items and hide items that don't match
     for (const foundItem of filtered) {
       for (const item of STORE) {
-        if(item !== foundItem) { item.hidden = true; }
+        if (item !== foundItem) {
+          item.hidden = true;
+        }
       }
     }
     renderShoppingList();
